@@ -1,0 +1,30 @@
+[build-system]
+# Modern setuptools is required for PEP 621 project metadata.
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rebar-converter"
+version = "0.1.0"
+description = "Offline Chinese rebar schedule PDF to Excel converter"
+requires-python = ">=3.11"
+dependencies = [
+  "PySide6>=6.6",
+  "PyMuPDF>=1.23",
+  "opencv-python>=4.8",
+  "paddleocr>=2.7",
+  "openpyxl>=3.1",
+]
+
+[project.optional-dependencies]
+test = ["pytest>=7.4"]
+
+[project.scripts]
+rebar-converter = "rebar_converter.gui.app:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
