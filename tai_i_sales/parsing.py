@@ -10,7 +10,8 @@ from .models import BarItem, OCRToken, PageOCR
 
 PAGE_MARKER = re.compile(r"(?<!\d)\d+\s*-\s*(\d+)(?!\d)")
 FIELD_LABELS = {
-    "bar_number": "號數", "total_length": "總長", "quantity": "支數", "total_weight": "總重",
+    "region": "區域", "page_number": "頁數", "bar_number": "號數",
+    "total_length": "總長", "quantity": "支數", "total_weight": "總重", "steel_grade": "鋼種",
 }
 
 

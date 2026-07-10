@@ -72,21 +72,31 @@ def run_review_gui(ocr_backend: OCRBackend | None = None) -> None:
     except ImportError as exc:
         raise RuntimeError("GUI 支援需要安裝 PySide6。") from exc
     app = QApplication.instance() or QApplication([])
-    window = QMainWindow()
-    window.setWindowTitle("離線鋼筋料單確認")
-    window.setCentralWidget(_review_window_class()([]))
+    class ReviewMainWindow(QMainWindow):
+        """Own the injected backend and conversion service for the window."""
+
+        def __init__(self, backend: OCRBackend):
+            super().__init__()
+            self.ocr_backend = backend
+            self.batch_processor = BatchProcessor(backend)
+            self.status_bar = QStatusBar()
+            self.setStatusBar(self.status_bar)
+
     if ocr_backend is None:
         try:
             ocr_backend = PaddleOCRBackend()
         except OCRModelUnavailable as exc:
+            window = QMainWindow()
             QMessageBox.critical(window, "OCR 模型錯誤", str(exc))
+            window.setWindowTitle("離線鋼筋料單確認")
+            window.show()
+            app.exec()
+            return
+    window = ReviewMainWindow(ocr_backend)
+    window.setWindowTitle("離線鋼筋料單確認")
+    window.setCentralWidget(_review_window_class()([]))
     if ocr_backend is not None:
-        status_bar = QStatusBar()
-        window.setStatusBar(status_bar)
-        status_bar.showMessage("已載入離線 OCR；低信心欄位需人工確認")
-        window.status_bar = status_bar
-        window.ocr_backend = ocr_backend
-        window.batch_processor = BatchProcessor(ocr_backend)
+        window.status_bar.showMessage("已載入離線 OCR；低信心欄位需人工確認")
     window.resize(900, 500)
     window.show()
     app.exec()
