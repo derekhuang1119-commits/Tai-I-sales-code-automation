@@ -13,9 +13,10 @@ from tai_i_sales.ocr import PaddleOCRBackend
 
 def _default_model_dir() -> Path:
     """Return the model directory next to the executable or source tree."""
-    base_dir = Path(sys.executable).resolve().parent if getattr(
-        sys, "frozen", False
-    ) else Path(__file__).resolve().parent.parent
+    if getattr(sys, "frozen", False):
+        base_dir = Path(sys.executable).resolve().parent
+    else:
+        base_dir = Path(__file__).resolve().parent.parent
     return base_dir / "models"
 
 
