@@ -43,7 +43,7 @@ def main() -> None:
             "OCR 模型錯誤",
             f"{exc}\n\n請使用 --model-dir 或 TAI_I_SALES_MODEL_DIR 指定本機模型。",
         )
-        return
+        sys.exit(1)
     run_review_gui(backend)
 
 

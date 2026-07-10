@@ -33,6 +33,8 @@ jobs:
           --name TaiISales
           --collect-all paddleocr
           --collect-all paddlex
+          # PaddleOCR loads Paddle modules and native assets dynamically.
+          # Collecting these packages prevents a build that starts but cannot OCR.
           --collect-all paddle
           tai_i_sales/desktop.py
 
