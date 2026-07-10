@@ -6,6 +6,8 @@ from typing import Any
 
 from .models import OCRToken, ShapeAnalysis
 
+SHAPE_CENTER_RATIO = 0.2
+
 
 def analyze_shape(tokens: list[OCRToken], *, is_stirrup: bool = False) -> ShapeAnalysis:
     """Assign numeric labels to the nearest of eight drawing regions."""
@@ -25,9 +27,9 @@ def analyze_shape(tokens: list[OCRToken], *, is_stirrup: bool = False) -> ShapeA
         x, y = token.center
         vertical = "top" if y <= mid_y else "bottom"
         horizontal = "left" if x < mid_x else "right"
-        if abs(x - mid_x) < (max(xs) - min(xs)) * 0.2:
+        if abs(x - mid_x) < (max(xs) - min(xs)) * SHAPE_CENTER_RATIO:
             key = "middle_top" if vertical == "top" else "middle_bottom"
-        elif abs(y - mid_y) < (max(ys) - min(ys)) * 0.2:
+        elif abs(y - mid_y) < (max(ys) - min(ys)) * SHAPE_CENTER_RATIO:
             key = f"{horizontal}_long"
         else:
             key = f"{horizontal}_{vertical}"
@@ -65,6 +67,6 @@ def row_is_crossed_out(image: Any, roi: tuple[int, int, int, int]) -> bool | Non
     diagonals = []
     for line in lines[:, 0]:
         dx, dy = line[2] - line[0], line[3] - line[1]
-        if abs(dx) > 0 and abs(dy) > 0 and abs(dy / dx) > 0.25:
+        if dx != 0 and abs(dy) > 0 and abs(dy / dx) > 0.25:
             diagonals.append(line)
     return len(diagonals) >= 2

@@ -5,7 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
-from .models import BarItem
+from .models import REQUIRED_FIELDS, BarItem
 
 
 HEADERS = {
@@ -13,7 +13,6 @@ HEADERS = {
     "total_length": "總長", "quantity": "支數", "total_weight": "總重",
     "steel_grade": "鋼種",
 }
-REQUIRED_FIELDS = ("region", "bar_number", "total_length", "quantity", "total_weight")
 
 
 def write_excel(items: list[BarItem], destination: str | Path, template: Any = None) -> Path:
@@ -35,7 +34,7 @@ def write_excel(items: list[BarItem], destination: str | Path, template: Any = N
     for item in items:
         if item.excluded:
             continue
-        missing = [HEADERS[key] for key in REQUIRED_FIELDS if not getattr(item, key)]
+        missing = [HEADERS[key] for key in REQUIRED_FIELDS if getattr(item, key) in (None, "")]
         if missing:
             raise ValueError(f"料件缺少必要欄位：{', '.join(missing)}")
         row = sheet.max_row + 1

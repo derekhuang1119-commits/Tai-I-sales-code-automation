@@ -6,7 +6,7 @@ import re
 from collections import defaultdict
 from typing import Iterable
 
-from .models import BarItem, OCRToken, PageOCR
+from .models import REQUIRED_FIELDS, BarItem, OCRToken, PageOCR
 
 PAGE_MARKER = re.compile(r"(?<!\d)\d+\s*-\s*(\d+)(?!\d)")
 FIELD_LABELS = {
@@ -44,6 +44,7 @@ def row_rois(page: PageOCR, horizontal_lines: Iterable[float] = ()) -> list[list
         return [sorted(value, key=lambda token: token.center[0]) for _, value in sorted(groups.items())]
     rows: list[list[OCRToken]] = []
     for token in sorted(page.tokens, key=lambda item: item.center[1]):
+        # Eight pixels prevents tiny OCR baseline jitter from making new rows.
         if not rows or abs(token.center[1] - rows[-1][0].center[1]) > max(8, token.bbox[3] - token.bbox[1]):
             rows.append([])
         rows[-1].append(token)
@@ -70,7 +71,7 @@ def parse_row(tokens: list[OCRToken], *, region: str = "", page_number: int | No
     item.page_number = page_number
     if not item.region:
         item.warnings.append("缺少區域")
-    for required in ("bar_number", "total_length", "quantity", "total_weight"):
+    for required in REQUIRED_FIELDS[1:]:
         if not getattr(item, required):
             item.warnings.append(f"缺少必要欄位：{FIELD_LABELS[required]}")
     item.needs_review = bool(item.warnings) or any(value < 0.8 for value in item.confidence.values())

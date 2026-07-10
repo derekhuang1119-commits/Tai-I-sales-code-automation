@@ -12,7 +12,7 @@ from .parsing import page_marker_number, parse_row, row_rois
 class BatchProcessor:
     """Convert sources after an OCR backend has explicitly been configured."""
 
-    def __init__(self, ocr_backend: OCRBackend | None = None) -> None:
+    def __init__(self, ocr_backend: OCRBackend) -> None:
         if ocr_backend is None:
             raise ValueError("必須注入離線 OCR backend，不可使用沒有 OCR 的 BatchProcessor。")
         self.ocr_backend = ocr_backend

@@ -5,6 +5,7 @@ from typing import Any
 
 Point = tuple[float, float]
 Polygon = tuple[Point, ...]
+REQUIRED_FIELDS = ("region", "bar_number", "total_length", "quantity", "total_weight")
 
 
 @dataclass(frozen=True)

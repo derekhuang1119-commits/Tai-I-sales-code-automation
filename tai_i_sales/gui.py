@@ -11,7 +11,7 @@ def _review_window_class():
     """Build the optional Qt class without importing PySide6 in core code."""
 
     from PySide6.QtCore import Qt
-    from PySide6.QtGui import QPixmap
+    from PySide6.QtGui import QImage, QPixmap
     from PySide6.QtWidgets import (
         QHBoxLayout, QLabel, QPushButton, QTableWidget, QTableWidgetItem, QVBoxLayout, QWidget,
     )
@@ -48,7 +48,14 @@ def _review_window_class():
                 if item.excluded:
                     self.table.setRowHidden(row, True)
             if self.items and self.items[0].source_page and self.items[0].source_page.image:
-                self.image.setPixmap(QPixmap.fromImage(self.items[0].source_page.image.toqimage()))
+                source = self.items[0].source_page.image
+                if hasattr(source, "toqimage"):
+                    qimage = source.toqimage()
+                else:
+                    source = source.convert("RGB")
+                    raw = source.tobytes("raw", "RGB")
+                    qimage = QImage(raw, source.width, source.height, QImage.Format.Format_RGB888)
+                self.image.setPixmap(QPixmap.fromImage(qimage))
 
         def restore_excluded(self) -> None:
             for row, item in enumerate(self.items):

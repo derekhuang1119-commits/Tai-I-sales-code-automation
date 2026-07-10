@@ -1,7 +1,7 @@
 from pathlib import Path
 
 import pytest
-from openpyxl import load_workbook
+from openpyxl import Workbook, load_workbook
 
 from tai_i_sales.excel import write_excel
 from tai_i_sales.ingest import image_to_page, pdf_to_pages
@@ -96,7 +96,7 @@ def test_normal_text_x_is_not_a_crossout_signal():
 
 
 def test_excel_maps_by_titles_and_leaves_steel_blank(tmp_path: Path):
-    workbook = __import__("openpyxl").Workbook()
+    workbook = Workbook()
     sheet = workbook.active
     for col, title in enumerate(["總重", "區域", "鋼種", "頁數", "號數", "支數", "總長"], 1):
         sheet.cell(1, col, title)
