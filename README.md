@@ -21,3 +21,14 @@ python -m tai_i_sales.cli input.pdf output.xlsx --region 北區 --model-dir C:\m
 目前限制：表格線偵測與複雜手寫/鳥嘴圖形仍需要針對現場表單校正；GUI 的
 確認結果尚未包含專用的儲存按鈕，應由宿主程式在 `apply_edits()` 後呼叫
 `write_excel()`。測試使用合成 OCR、圖片與 PDF fixture，不包含模型或客戶資料。
+
+## Windows executable
+
+Push a `v*` tag, or manually run **Build Windows executable** in GitHub Actions.
+The workflow publishes `TaiISales-windows-x64.zip` as a release asset for tags
+and as a downloadable Actions artifact for manual builds.
+
+Extract the archive, put the locally installed PaddleOCR model files in the
+included `models` folder, and start `TaiISales.exe`. To use another local model
+directory, set `TAI_I_SALES_MODEL_DIR` before launching the executable. The build
+does not contain customer documents and does not enable cloud OCR or telemetry.

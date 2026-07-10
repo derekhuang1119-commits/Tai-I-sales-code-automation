@@ -1,0 +1,65 @@
+name: Build Windows executable
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install application and packaging dependencies
+        shell: bash
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install ".[gui,ocr]"
+          python -m pip install pyinstaller
+
+      - name: Build executable
+        run: >
+          pyinstaller --noconfirm --clean --windowed
+          --name TaiISales
+          --collect-all paddleocr
+          --collect-all paddlex
+          # PaddleOCR loads Paddle modules and native assets dynamically.
+          # Collecting these packages prevents a build that starts but cannot OCR.
+          --collect-all paddle
+          tai_i_sales/desktop.py
+
+      - name: Add offline model setup instructions
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force dist\TaiISales\models | Out-Null
+          @"
+          Put the locally downloaded PaddleOCR model files in this folder.
+          The application does not download documents, models, or telemetry.
+          You can also set TAI_I_SALES_MODEL_DIR to another local model folder.
+          "@ | Set-Content dist\TaiISales\models\README.txt
+
+      - name: Create downloadable archive
+        shell: pwsh
+        run: Compress-Archive -Path dist\TaiISales\* -DestinationPath TaiISales-windows-x64.zip
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: TaiISales-windows-x64
+          path: TaiISales-windows-x64.zip
+
+      - name: Publish tagged release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: TaiISales-windows-x64.zip

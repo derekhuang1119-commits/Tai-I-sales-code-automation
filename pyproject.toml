@@ -24,3 +24,4 @@ pythonpath = ["."]
 
 [project.scripts]
 tai-i-sales = "tai_i_sales.cli:main"
+tai-i-sales-gui = "tai_i_sales.desktop:main"
