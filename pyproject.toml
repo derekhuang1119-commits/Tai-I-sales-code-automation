@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tai-i-sales-code-automation"
+version = "0.1.0"
+description = "Offline reinforcement-bar order sheet OCR to Excel MVP"
+requires-python = ">=3.11"
+dependencies = [
+  "openpyxl>=3.1",
+  "Pillow>=10",
+  "PyMuPDF>=1.23",
+]
+
+[project.optional-dependencies]
+ocr = ["paddleocr>=2.7", "paddlepaddle>=2.6"]
+gui = ["PySide6>=6.6"]
+dev = ["pytest>=8"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+
+[project.scripts]
+tai-i-sales = "tai_i_sales.cli:main"
