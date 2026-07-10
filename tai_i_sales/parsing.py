@@ -9,6 +9,9 @@ from typing import Iterable
 from .models import BarItem, OCRToken, PageOCR
 
 PAGE_MARKER = re.compile(r"(?<!\d)\d+\s*-\s*(\d+)(?!\d)")
+FIELD_LABELS = {
+    "bar_number": "號數", "total_length": "總長", "quantity": "支數", "total_weight": "總重",
+}
 
 
 def page_marker_number(page: PageOCR, roi_ratio: float = 0.25) -> int | None:
@@ -68,6 +71,6 @@ def parse_row(tokens: list[OCRToken], *, region: str = "", page_number: int | No
         item.warnings.append("缺少區域")
     for required in ("bar_number", "total_length", "quantity", "total_weight"):
         if not getattr(item, required):
-            item.warnings.append(f"缺少必要欄位：{required}")
+            item.warnings.append(f"缺少必要欄位：{FIELD_LABELS[required]}")
     item.needs_review = bool(item.warnings) or any(value < 0.8 for value in item.confidence.values())
     return item

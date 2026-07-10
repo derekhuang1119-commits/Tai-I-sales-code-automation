@@ -81,8 +81,10 @@ def run_review_gui(ocr_backend: OCRBackend | None = None) -> None:
         except OCRModelUnavailable as exc:
             QMessageBox.critical(window, "OCR 模型錯誤", str(exc))
     if ocr_backend is not None:
-        window.setStatusBar(QStatusBar())
-        window.statusBar().showMessage("已載入離線 OCR；低信心欄位需人工確認")
+        status_bar = QStatusBar()
+        window.setStatusBar(status_bar)
+        status_bar.showMessage("已載入離線 OCR；低信心欄位需人工確認")
+        window.status_bar = status_bar
         window.ocr_backend = ocr_backend
         window.batch_processor = BatchProcessor(ocr_backend)
     window.resize(900, 500)
