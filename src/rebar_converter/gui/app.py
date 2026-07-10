@@ -25,17 +25,21 @@ def main() -> int:
             self.setCentralWidget(container)
 
         def convert(self) -> None:
-            source = QFileDialog.getExistingDirectory(self, "選擇 PDF/圖片資料夾")
-            if not source:
-                source, _ = QFileDialog.getOpenFileName(self, "選擇 PDF", filter="PDF (*.pdf)")
-            if not source:
+            source_dir = QFileDialog.getExistingDirectory(self, "選擇 PDF/圖片資料夾")
+            source_path = source_dir
+            if not source_path:
+                source_file, _ = QFileDialog.getOpenFileName(
+                    self, "選擇 PDF", filter="PDF (*.pdf)"
+                )
+                source_path = source_file
+            if not source_path:
                 return
             template, _ = QFileDialog.getOpenFileName(self, "選擇 Excel 範本（可取消）",
                                                       filter="Excel (*.xlsx)")
             output = QFileDialog.getExistingDirectory(self, "選擇輸出資料夾")
             if output:
                 count = len(BatchProcessor().process(
-                    Path(source), Path(output), Path(template) if template else None))
+                    Path(source_path), Path(output), Path(template) if template else None))
                 self.status.setText(f"完成 {count} 個檔案；低信心欄位請人工確認")
 
     application = QApplication(sys.argv)

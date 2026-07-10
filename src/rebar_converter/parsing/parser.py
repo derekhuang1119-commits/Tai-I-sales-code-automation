@@ -4,6 +4,8 @@ from typing import Iterable
 from rebar_converter.models import RebarItem
 
 REVIEW_CONFIDENCE_THRESHOLD = 0.8
+STIRRUP_SHAPE = "箍筋"
+FORMED_SHAPE = "一般成型料"
 
 
 def parse_bar_number(value: str) -> str:
@@ -47,8 +49,8 @@ class RebarParser:
         item.bar_number = parse_bar_number(item.bar_number)
         item.page = parse_page_number(block) or page_hint
         item.steel_grade = ""
-        item.shape_type = "箍筋" if re.search(r"箍筋|箍", block) else "一般成型料"
-        item.has_bird_beak = item.shape_type == "箍筋" and bool(
+        item.shape_type = STIRRUP_SHAPE if re.search(r"箍筋|箍", block) else FORMED_SHAPE
+        item.has_bird_beak = item.shape_type == STIRRUP_SHAPE and bool(
             re.search(r"鳥嘴|鸟嘴|bird\s*beak", block, re.IGNORECASE)
         )
         if re.search(r"(?:手寫\s*)?X|劃掉|划掉", block, re.IGNORECASE):

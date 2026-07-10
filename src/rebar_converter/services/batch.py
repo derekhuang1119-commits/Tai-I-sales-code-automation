@@ -21,8 +21,13 @@ class BatchProcessor:
         self.ocr = ocr
 
     def process(self, source: Path, output_dir: Path, template: Path | None = None) -> list[Path]:
-        sources = sorted(path for path in source.iterdir()
-                         if path.suffix.lower() in {".pdf", ".png", ".jpg", ".jpeg"}) if source.is_dir() else [source]
+        if source.is_dir():
+            sources = sorted(
+                path for path in source.iterdir()
+                if path.suffix.lower() in {".pdf", ".png", ".jpg", ".jpeg"}
+            )
+        else:
+            sources = [source]
         results: list[Path] = []
         for pdf in sources:
             try:

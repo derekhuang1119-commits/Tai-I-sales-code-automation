@@ -1,4 +1,5 @@
 [build-system]
+# Modern setuptools is required for PEP 621 project metadata.
 requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
@@ -27,4 +28,3 @@ where = ["src"]
 [tool.pytest.ini_options]
 pythonpath = ["src"]
 testpaths = ["tests"]
-

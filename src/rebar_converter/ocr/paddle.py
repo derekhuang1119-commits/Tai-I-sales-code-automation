@@ -14,8 +14,12 @@ class PaddleOCREngine:
             from paddleocr import PaddleOCR
         except ImportError as exc:
             raise RuntimeError("PaddleOCR is required for image OCR") from exc
-        options = {"lang": language, "use_angle_cls": use_angle_cls, "use_gpu": False,
-                   "show_log": False}
+        options = {
+            "lang": language,
+            "use_angle_cls": use_angle_cls,
+            "use_gpu": False,
+            "show_log": False,
+        }
         if model_dir is not None:
             options["det_model_dir"] = str(model_dir / "det")
             options["rec_model_dir"] = str(model_dir / "rec")

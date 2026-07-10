@@ -1,5 +1,7 @@
 from rebar_converter.models import RebarItem
 
+STIRRUP_WARNING = "箍筋含鳥嘴"
+
 
 class RuleEngine:
     """Applies business rules without making uncertain guesses."""
@@ -12,10 +14,9 @@ class RuleEngine:
         if item.shape_type != "箍筋":
             item.has_bird_beak = False
         if item.has_bird_beak and "鳥嘴" not in item.warnings:
-            item.warnings.append("箍筋含鳥嘴")
+            item.warnings.append(STIRRUP_WARNING)
         item.needs_review = item.needs_review or not item.quantity or not item.total_weight
         return item
 
     def apply_all(self, items: list[RebarItem]) -> list[RebarItem]:
         return [self.apply(item) for item in items if not item.excluded]
-
