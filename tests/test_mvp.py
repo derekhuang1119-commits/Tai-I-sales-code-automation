@@ -112,7 +112,6 @@ def test_excel_maps_by_titles_and_leaves_steel_blank(tmp_path: Path):
 
 
 def test_excel_rejects_missing_required_fields(tmp_path):
-    from openpyxl import Workbook
     template = tmp_path / "template.xlsx"
     sheet = Workbook()
     sheet.active.append(["區域", "頁數", "號數", "總長", "支數", "總重", "鋼種"])

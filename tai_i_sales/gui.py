@@ -102,8 +102,7 @@ def run_review_gui(ocr_backend: OCRBackend | None = None) -> None:
     window = ReviewMainWindow(ocr_backend)
     window.setWindowTitle("離線鋼筋料單確認")
     window.setCentralWidget(_review_window_class()([]))
-    if ocr_backend is not None:
-        window.status_bar.showMessage("已載入離線 OCR；低信心欄位需人工確認")
+    window.status_bar.showMessage("已載入離線 OCR；低信心欄位需人工確認")
     window.resize(900, 500)
     window.show()
     app.exec()
