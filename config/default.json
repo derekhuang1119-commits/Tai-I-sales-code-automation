@@ -1,0 +1,7 @@
+{
+  "ocr_language": "ch",
+  "render_dpi": 200,
+  "review_confidence_threshold": 0.8,
+  "log_level": "INFO"
+}
+

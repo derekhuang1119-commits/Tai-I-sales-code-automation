@@ -1,0 +1,6 @@
+PySide6>=6.6
+PyMuPDF>=1.23
+opencv-python>=4.8
+paddleocr>=2.7
+openpyxl>=3.1
+
