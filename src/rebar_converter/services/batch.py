@@ -44,6 +44,6 @@ class BatchProcessor:
                 output = output_dir / f"{pdf.stem}.xlsx"
                 self.writer.write(items, output, template)
                 results.append(output)
-            except Exception:
-                LOGGER.exception("處理失敗: %s", pdf)
+            except Exception as exc:
+                LOGGER.exception("處理失敗 (%s): %s", pdf, exc)
         return results

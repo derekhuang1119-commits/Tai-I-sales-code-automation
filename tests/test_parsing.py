@@ -17,3 +17,8 @@ def test_parser_marks_crossed_out_and_handwritten() -> None:
     assert item.excluded
     assert item.needs_review
 
+
+def test_parser_parse_lines_accepts_iterable() -> None:
+    items = RebarParser().parse_lines(["A區", "支數：1", "總重：2"])
+    assert len(items) == 1
+    assert items[0].quantity == "1"

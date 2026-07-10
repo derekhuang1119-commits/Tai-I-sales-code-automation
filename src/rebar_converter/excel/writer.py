@@ -8,7 +8,7 @@ HEADERS = ("區域", "頁數", "鋼種", "號數", "左上", "左長", "左下",
 FIELDS = ("region", "page", "steel_grade", "bar_number", "left_top", "left_long",
           "left_bottom", "middle_top", "middle_bottom", "right_top", "right_long",
           "right_bottom", "has_bird_beak", "total_length", "quantity", "total_weight")
-# Excel's localized representation for a true bird-beak flag.
+# Excel's localized representation for a true bird beak flag.
 BIRD_BEAK_MARK = "是"
 
 
