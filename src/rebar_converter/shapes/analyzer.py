@@ -1,6 +1,6 @@
 import re
 
-from rebar_converter.models import DIMENSION_FIELDS, RebarItem
+from rebar_converter.models import RebarItem
 
 
 class ShapeAnalyzer:
@@ -18,4 +18,3 @@ class ShapeAnalyzer:
             if match:
                 setattr(item, field, match.group(1).replace(",", ""))
         return item
-

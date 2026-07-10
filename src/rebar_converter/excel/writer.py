@@ -8,6 +8,7 @@ HEADERS = ("區域", "頁數", "鋼種", "號數", "左上", "左長", "左下",
 FIELDS = ("region", "page", "steel_grade", "bar_number", "left_top", "left_long",
           "left_bottom", "middle_top", "middle_bottom", "right_top", "right_long",
           "right_bottom", "has_bird_beak", "total_length", "quantity", "total_weight")
+BIRD_BEAK_MARK = "是"
 
 
 class ExcelWriter:
@@ -36,7 +37,7 @@ class ExcelWriter:
                 column = positions.get(header)
                 if column:
                     value = getattr(item, field)
-                    sheet.cell(row, column, "是" if value is True else value)
+                    sheet.cell(row, column, BIRD_BEAK_MARK if value is True else value)
                     if item.needs_review:
                         sheet.cell(row, column).fill = review_fill
         output_path.parent.mkdir(parents=True, exist_ok=True)

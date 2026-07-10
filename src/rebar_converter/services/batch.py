@@ -32,7 +32,7 @@ class BatchProcessor:
                         parsed = self.parser.parse(text, str(page))
                         items.extend(self.rules.apply_all([self.shapes.apply(item) for item in parsed]))
                 elif self.ocr is None:
-                    raise RuntimeError("影像來源需要離線 OCR backend")
+                    raise RuntimeError("Image sources require an offline OCR backend")
                 else:
                     text = "\n".join(result.text for result in self.ocr.recognize(pdf))
                     items.extend(self.rules.apply_all(self.parser.parse(text)))

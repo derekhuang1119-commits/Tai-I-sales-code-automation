@@ -3,6 +3,8 @@ from typing import Iterable
 
 from rebar_converter.models import RebarItem
 
+REVIEW_CONFIDENCE_THRESHOLD = 0.8
+
 
 def parse_bar_number(value: str) -> str:
     """Return a bar number without the drawing marker."""
@@ -53,7 +55,11 @@ class RebarParser:
             item.excluded = True
             item.warnings.append("疑似整筆料件被劃掉")
         item.confidence = 0.7 if re.search(r"手寫|修改", block) else 1.0
-        item.needs_review = item.confidence < 0.8 or not item.quantity or not item.total_weight
+        item.needs_review = (
+            item.confidence < REVIEW_CONFIDENCE_THRESHOLD
+            or not item.quantity
+            or not item.total_weight
+        )
         if item.needs_review:
             item.warnings.append("欄位不足或信心度偏低，請人工確認")
         return item

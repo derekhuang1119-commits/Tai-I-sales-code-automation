@@ -9,9 +9,10 @@ def test_rules_keep_steel_blank_and_clear_bird_beak_for_normal_shape() -> None:
     assert result.steel_grade == ""
     assert result.bar_number == "4"
     assert not result.has_bird_beak
+    assert result.quantity == "1"
+    assert result.total_weight == "2"
 
 
 def test_rules_use_middle_top_for_straight_bar_length() -> None:
     item = RebarItem(shape_type="直料", middle_top="300", quantity="1", total_weight="2")
     assert RuleEngine().apply(item).total_length == "300"
-
