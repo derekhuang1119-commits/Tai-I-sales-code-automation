@@ -24,6 +24,10 @@ class PaddleOCRBackend:
 
     PaddleOCR is imported lazily so parsing and tests remain usable without the
     optional model package. No network or telemetry mode is enabled.
+
+    Supports both the legacy ``ocr(...)`` / ``__call__`` API (PaddleOCR ≤ 2.6)
+    and the newer ``predict(...)`` API (PaddleOCR ≥ 2.7). The method is chosen
+    at runtime to avoid ``AttributeError`` on either version.
     """
 
     def __init__(self, model_dir: str | Path | None = None, **kwargs: Any) -> None:
@@ -48,12 +52,17 @@ class PaddleOCRBackend:
         except Exception as exc:
             raise OCRModelUnavailable(f"無法載入本機離線 OCR 模型：{exc}") from exc
 
-    def recognize(self, image: Any, page_number: int) -> list[OCRToken]:
-        result = self._ocr.predict(image)
+    def _call_ocr(self, image: Any) -> Any:
+        """Call the OCR engine using whichever API is available."""
+        if hasattr(self._ocr, "predict"):
+            return self._ocr.predict(image)
+        # Legacy API: __call__ / ocr()
+        return self._ocr(image, cls=False)
+
+    def _parse_predict_result(self, result: Any, page_number: int) -> list[OCRToken]:
+        """Parse the result from the predict() API (PaddleOCR ≥ 2.7)."""
         tokens: list[OCRToken] = []
         for page in result:
-            # New PaddleOCR returns dict-like predictions; older versions
-            # expose the same JSON payload through a ``json`` method.
             data = page if isinstance(page, dict) else getattr(page, "json", lambda: {})()
             data = data.get("res", data)
             polygons = data.get("rec_polys", data.get("dt_polys", []))
@@ -62,3 +71,35 @@ class PaddleOCRBackend:
             for polygon, text, score in zip(polygons, texts, scores):
                 tokens.append(OCRToken(str(text), float(score), tuple(tuple(p) for p in polygon), page_number))
         return tokens
+
+    def _parse_legacy_result(self, result: Any, page_number: int) -> list[OCRToken]:
+        """Parse the result from the legacy ocr() API (PaddleOCR ≤ 2.6).
+
+        Legacy format: list of lines, each line is ``[polygon, (text, score)]``.
+        """
+        tokens: list[OCRToken] = []
+        if result is None:
+            return tokens
+        for line_group in result:
+            if line_group is None:
+                continue
+            for line in line_group:
+                if not (isinstance(line, (list, tuple)) and len(line) == 2):
+                    continue
+                polygon_raw, text_score = line
+                if not (isinstance(text_score, (list, tuple)) and len(text_score) == 2):
+                    continue
+                text, score = text_score
+                try:
+                    poly = tuple(tuple(p) for p in polygon_raw)
+                    tokens.append(OCRToken(str(text), float(score), poly, page_number))
+                except Exception:
+                    continue
+        return tokens
+
+    def recognize(self, image: Any, page_number: int) -> list[OCRToken]:
+        result = self._call_ocr(image)
+        # Determine which result format was returned
+        if hasattr(self._ocr, "predict"):
+            return self._parse_predict_result(result, page_number)
+        return self._parse_legacy_result(result, page_number)

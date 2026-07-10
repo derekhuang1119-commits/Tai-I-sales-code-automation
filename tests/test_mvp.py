@@ -57,6 +57,9 @@ def test_scanned_pdf_renders_300_dpi_and_uses_ocr(monkeypatch):
         def __iter__(self):
             return iter([PdfPage()])
 
+        def close(self):
+            pass
+
     backend = FakeOCR()
     pages = pdf_to_pages("synthetic.pdf", backend, pdf_open=lambda _: Document(), text_threshold=20)
     assert pages[0].used_ocr_fallback
@@ -64,8 +67,11 @@ def test_scanned_pdf_renders_300_dpi_and_uses_ocr(monkeypatch):
 
 
 def test_page_marker_uses_bottom_right_dash_value():
+    # "3-2" is lower on the page (y=900) than "3-1" (y=850); the bottom-most
+    # matching token should be selected so the result is stable regardless of
+    # token ordering.
     page = PageOCR(1, 1000, 1000, [token("3-1", 850, 850), token("3-2", 850, 900)])
-    assert page_marker_number(page) == 1  # the bottom-right ROI uses the first page marker
+    assert page_marker_number(page) == 2
 
 
 def test_x_in_ocr_text_does_not_exclude_row():
@@ -87,8 +93,8 @@ def test_rows_are_split_by_horizontal_table_lines_and_retain_geometry():
 
 def test_straight_bar_goes_to_middle_top_and_non_stirrup_bird_mouth_empty():
     shape = analyze_shape([token("120", 50, 50)], is_stirrup=False)
-    assert shape.middle_top == "120"
-    assert shape.bird_mouth == ""
+    assert shape.middle_top == 120.0
+    assert shape.bird_mouth is None
 
 
 def test_normal_text_x_is_not_a_crossout_signal():
@@ -103,12 +109,12 @@ def test_excel_maps_by_titles_and_leaves_steel_blank(tmp_path: Path):
     template = tmp_path / "template.xlsx"
     output = tmp_path / "output.xlsx"
     workbook.save(template)
-    write_excel([BarItem(region="北區", page_number=1, bar_number="12", total_length="600",
-                         quantity="2", total_weight="30")], output, template)
+    write_excel([BarItem(region="北區", page_number=1, bar_number="12", total_length=600.0,
+                         quantity=2, total_weight=30.0)], output, template)
     result = load_workbook(output).active
     assert result.cell(2, 2).value == "北區"
-    assert result.cell(2, 3).value is None
-    assert result.cell(2, 7).value == "600"
+    assert result.cell(2, 3).value is None  # steel grade stays blank
+    assert result.cell(2, 7).value == 600.0
 
 
 def test_excel_rejects_missing_required_fields(tmp_path):

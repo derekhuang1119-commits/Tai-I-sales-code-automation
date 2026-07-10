@@ -46,17 +46,17 @@ class PageOCR:
 
 @dataclass
 class ShapeAnalysis:
-    """Shape fields inferred from drawing and nearby OCR coordinates."""
+    """Shape fields inferred from the shape-column ROI and nearby OCR coordinates."""
 
-    left_top: str = ""
-    left_long: str = ""
-    left_bottom: str = ""
-    middle_top: str = ""
-    middle_bottom: str = ""
-    right_top: str = ""
-    right_long: str = ""
-    right_bottom: str = ""
-    bird_mouth: str = ""
+    left_top: float | None = None
+    left_long: float | None = None
+    left_bottom: float | None = None
+    middle_top: float | None = None
+    middle_bottom: float | None = None
+    right_top: float | None = None
+    right_long: float | None = None
+    right_bottom: float | None = None
+    bird_mouth: float | None = None
     is_stirrup: bool = False
     warnings: list[str] = field(default_factory=list)
 
@@ -68,9 +68,9 @@ class BarItem:
     region: str = ""
     page_number: int | None = None
     bar_number: str = ""
-    total_length: str = ""
-    quantity: str = ""
-    total_weight: str = ""
+    total_length: float | None = None
+    quantity: int | None = None
+    total_weight: float | None = None
     steel_grade: str = ""
     shape: ShapeAnalysis = field(default_factory=ShapeAnalysis)
     confidence: dict[str, float] = field(default_factory=dict)
@@ -78,3 +78,4 @@ class BarItem:
     excluded: bool = False
     needs_review: bool = False
     source_page: PageOCR | None = None
+    source_roi: tuple[int, int, int, int] | None = None

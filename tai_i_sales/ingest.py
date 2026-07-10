@@ -33,7 +33,8 @@ def pdf_to_pages(
     """Extract a PDF and OCR pages whose extracted text is below the threshold.
 
     Scanned pages are rendered at exactly 300 DPI and then sent through the
-    same backend used by image files.
+    same backend used by image files. The PDF document is always closed after
+    iteration to prevent file-handle leaks on Windows.
     """
 
     try:
@@ -42,30 +43,33 @@ def pdf_to_pages(
         raise RuntimeError("PDF 支援需要安裝 PyMuPDF。") from exc
     document = pdf_open(str(path)) if pdf_open else fitz.open(str(path))
     pages: list[PageOCR] = []
-    for index, pdf_page in enumerate(document):
-        raw_text = pdf_page.get_text("text")
-        if len(raw_text.strip()) >= text_threshold:
-            rect = pdf_page.rect
-            tokens = []
-            for word in pdf_page.get_text("words"):
-                x0, y0, x1, y1, text = word[:5]
-                tokens.append(OCRToken(str(text), 1.0, ((x0, y0), (x1, y0), (x1, y1), (x0, y1)), index + 1))
-            if not tokens:
-                polygon = ((0, 0), (rect.width, 0), (rect.width, rect.height), (0, rect.height))
-                tokens = [OCRToken(raw_text.strip(), 1.0, polygon, index + 1)]
-            pages.append(PageOCR(index + 1, int(rect.width), int(rect.height), tokens))
-            continue
-        zoom = RENDER_DPI / 72
-        pixmap = pdf_page.get_pixmap(matrix=fitz.Matrix(zoom, zoom), alpha=False)
-        try:
-            from PIL import Image
-            import io
-            image = Image.open(io.BytesIO(pixmap.tobytes("png")))
-        except ImportError as exc:
-            raise RuntimeError("掃描 PDF OCR 需要安裝 Pillow。") from exc
-        page = image_to_page(image, backend, index + 1)
-        page.used_ocr_fallback = True
-        pages.append(page)
+    try:
+        for index, pdf_page in enumerate(document):
+            raw_text = pdf_page.get_text("text")
+            if len(raw_text.strip()) >= text_threshold:
+                rect = pdf_page.rect
+                tokens = []
+                for word in pdf_page.get_text("words"):
+                    x0, y0, x1, y1, text = word[:5]
+                    tokens.append(OCRToken(str(text), 1.0, ((x0, y0), (x1, y0), (x1, y1), (x0, y1)), index + 1))
+                if not tokens:
+                    polygon = ((0, 0), (rect.width, 0), (rect.width, rect.height), (0, rect.height))
+                    tokens = [OCRToken(raw_text.strip(), 1.0, polygon, index + 1)]
+                pages.append(PageOCR(index + 1, int(rect.width), int(rect.height), tokens))
+                continue
+            zoom = RENDER_DPI / 72
+            pixmap = pdf_page.get_pixmap(matrix=fitz.Matrix(zoom, zoom), alpha=False)
+            try:
+                from PIL import Image
+                import io
+                image = Image.open(io.BytesIO(pixmap.tobytes("png")))
+            except ImportError as exc:
+                raise RuntimeError("掃描 PDF OCR 需要安裝 Pillow。") from exc
+            page = image_to_page(image, backend, index + 1)
+            page.used_ocr_fallback = True
+            pages.append(page)
+    finally:
+        document.close()
     return pages
 
 
