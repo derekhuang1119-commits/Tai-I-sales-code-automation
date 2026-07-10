@@ -65,7 +65,8 @@ def _review_window_class():
         def apply_edits(self) -> None:
             for row, item in enumerate(self.items):
                 for col, field in enumerate(self.fields):
-                    value = self.table.item(row, col).text()
+                    cell = self.table.item(row, col)
+                    value = cell.text() if cell is not None else ""
                     setattr(item, field, int(value) if field == "page_number" and value else value)
 
     return ReviewWindow

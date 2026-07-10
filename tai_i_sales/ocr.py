@@ -52,6 +52,8 @@ class PaddleOCRBackend:
         result = self._ocr.predict(image)
         tokens: list[OCRToken] = []
         for page in result:
+            # New PaddleOCR returns dict-like predictions; older versions
+            # expose the same JSON payload through a ``json`` method.
             data = page if isinstance(page, dict) else getattr(page, "json", lambda: {})()
             data = data.get("res", data)
             polygons = data.get("rec_polys", data.get("dt_polys", []))
