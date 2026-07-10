@@ -7,8 +7,8 @@ import os
 import sys
 from pathlib import Path
 
-from .gui import run_review_gui
-from .ocr import PaddleOCRBackend
+from tai_i_sales.gui import run_review_gui
+from tai_i_sales.ocr import PaddleOCRBackend
 
 
 def _default_model_dir() -> Path:
