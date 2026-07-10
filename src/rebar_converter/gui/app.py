@@ -26,8 +26,9 @@ def main() -> int:
 
         def convert(self) -> None:
             source_dir = QFileDialog.getExistingDirectory(self, "選擇 PDF/圖片資料夾")
-            selected_source = source_dir
-            if not selected_source:
+            if source_dir:
+                selected_source = source_dir
+            else:
                 source_file, _ = QFileDialog.getOpenFileName(
                     self, "選擇 PDF", filter="PDF (*.pdf)"
                 )

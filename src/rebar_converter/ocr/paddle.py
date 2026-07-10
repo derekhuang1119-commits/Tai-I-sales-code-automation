@@ -30,7 +30,9 @@ class PaddleOCREngine:
         result = self._ocr.ocr(str(image_path), cls=True)
         texts: list[OCRText] = []
         for page in result or []:
-            for _box, recognition in page or []:
+            for box, recognition in page or []:
+                # Bounding boxes are retained by the backend for future layout analysis.
+                _ = box
                 text, score = recognition
                 texts.append(OCRText(str(text), float(score)))
         return texts

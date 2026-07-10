@@ -27,7 +27,6 @@ class PDFReader:
         matrix = fitz.Matrix(scale, scale)
         with fitz.open(path) as document:
             for index, page in enumerate(document, 1):
-                output = output_dir / f"{Path(path).stem}-{index}.png"
+                output = output_dir / f"{path.stem}-{index}.png"
                 page.get_pixmap(matrix=matrix, alpha=False).save(output)
                 yield index, output
-

@@ -4,6 +4,7 @@ from typing import Iterable
 from rebar_converter.models import RebarItem
 
 REVIEW_CONFIDENCE_THRESHOLD = 0.8
+HANDWRITTEN_CONFIDENCE = 0.7
 STIRRUP_SHAPE = "箍筋"
 FORMED_SHAPE = "一般成型料"
 
@@ -56,7 +57,7 @@ class RebarParser:
         if re.search(r"(?:手寫\s*)?X|劃掉|划掉", block, re.IGNORECASE):
             item.excluded = True
             item.warnings.append("疑似整筆料件被劃掉")
-        item.confidence = 0.7 if re.search(r"手寫|修改", block) else 1.0
+        item.confidence = HANDWRITTEN_CONFIDENCE if re.search(r"手寫|修改", block) else 1.0
         item.needs_review = (
             item.confidence < REVIEW_CONFIDENCE_THRESHOLD
             or not item.quantity

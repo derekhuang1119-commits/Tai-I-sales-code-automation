@@ -8,6 +8,7 @@ def test_rules_clear_steel_grade_and_bird_beak_for_normal_shape() -> None:
     result = RuleEngine().apply(item)
     assert result.steel_grade == ""
     assert result.bar_number == "4"
+    assert result.shape_type == "一般成型料"
     assert not result.has_bird_beak
     assert result.quantity == "1"
     assert result.total_weight == "2"

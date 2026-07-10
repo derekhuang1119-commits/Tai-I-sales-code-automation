@@ -10,6 +10,7 @@ FIELDS = ("region", "page", "steel_grade", "bar_number", "left_top", "left_long"
           "right_bottom", "has_bird_beak", "total_length", "quantity", "total_weight")
 # Excel's localized representation for a true bird beak flag.
 BIRD_BEAK_MARK = "是"
+HEADER_ROW = 1
 
 
 class ExcelWriter:
@@ -26,10 +27,10 @@ class ExcelWriter:
         else:
             workbook = Workbook()
         sheet = workbook.active
-        headers = [cell.value for cell in sheet[1]]
+        headers = [cell.value for cell in sheet[HEADER_ROW]]
         if not any(header in HEADERS for header in headers):
             for column, header in enumerate(HEADERS, 1):
-                sheet.cell(1, column, header)
+                sheet.cell(HEADER_ROW, column, header)
             headers = list(HEADERS)
         positions = {header: index + 1 for index, header in enumerate(headers) if header in HEADERS}
         review_fill = PatternFill("solid", fgColor="FFF2CC")
