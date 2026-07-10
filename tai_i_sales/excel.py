@@ -24,6 +24,9 @@ def write_excel(items: list[BarItem], destination: str | Path, template: Any = N
         raise RuntimeError("Excel 支援需要安裝 openpyxl。") from exc
     workbook = load_workbook(template) if template else Workbook()
     sheet = workbook.active
+    if template is None and sheet.max_row == 1 and all(cell.value is None for cell in sheet[1]):
+        for column, title in enumerate(HEADERS.values(), 1):
+            sheet.cell(row=1, column=column, value=title)
     headers = {cell.value: cell.column for cell in sheet[1] if cell.value}
     for title in HEADERS.values():
         if title not in headers:
