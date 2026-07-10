@@ -8,7 +8,7 @@ import sys
 from pathlib import Path
 
 from tai_i_sales.gui import run_review_gui
-from tai_i_sales.ocr import PaddleOCRBackend
+from tai_i_sales.ocr import OCRModelUnavailable, PaddleOCRBackend
 
 
 def _default_model_dir() -> Path:
@@ -25,11 +25,26 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="離線鋼筋料單確認工具")
     parser.add_argument(
         "--model-dir",
-        default=os.environ.get("TAI_I_SALES_MODEL_DIR", str(_default_model_dir())),
+        type=Path,
+        default=Path(os.environ.get("TAI_I_SALES_MODEL_DIR", _default_model_dir())),
         help="本機 PaddleOCR 模型目錄；預設為執行檔旁的 models 資料夾",
     )
     args = parser.parse_args()
-    run_review_gui(PaddleOCRBackend(args.model_dir))
+    try:
+        backend = PaddleOCRBackend(args.model_dir)
+    except OCRModelUnavailable as exc:
+        try:
+            from PySide6.QtWidgets import QApplication, QMessageBox
+        except ImportError:
+            raise RuntimeError(str(exc)) from exc
+        app = QApplication.instance() or QApplication([])
+        QMessageBox.critical(
+            None,
+            "OCR 模型錯誤",
+            f"{exc}\n\n請使用 --model-dir 或 TAI_I_SALES_MODEL_DIR 指定本機模型。",
+        )
+        return
+    run_review_gui(backend)
 
 
 if __name__ == "__main__":
