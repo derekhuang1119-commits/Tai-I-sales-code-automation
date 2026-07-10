@@ -32,6 +32,11 @@ class ExcelWriter:
             for column, header in enumerate(HEADERS, 1):
                 sheet.cell(HEADER_ROW, column, header)
             headers = list(HEADERS)
+        else:
+            for header in HEADERS:
+                if header not in headers:
+                    headers.append(header)
+                    sheet.cell(HEADER_ROW, len(headers), header)
         positions = {header: index + 1 for index, header in enumerate(headers) if header in HEADERS}
         review_fill = PatternFill("solid", fgColor="FFF2CC")
         for row, item in enumerate(items, 2):
