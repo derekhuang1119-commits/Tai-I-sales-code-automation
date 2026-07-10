@@ -34,7 +34,10 @@ def write_excel(items: list[BarItem], destination: str | Path, template: Any = N
     for item in items:
         if item.excluded:
             continue
-        missing = [key for key in ("region", "quantity", "total_weight") if not getattr(item, key)]
+        missing = [
+            key for key in ("region", "bar_number", "total_length", "quantity", "total_weight")
+            if not getattr(item, key)
+        ]
         if missing:
             raise ValueError(f"料件缺少必要欄位：{', '.join(missing)}")
         row = sheet.max_row + 1

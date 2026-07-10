@@ -65,7 +65,7 @@ def test_scanned_pdf_renders_300_dpi_and_uses_ocr(monkeypatch):
 
 def test_page_marker_uses_bottom_right_dash_value():
     page = PageOCR(1, 1000, 1000, [token("3-1", 850, 850), token("3-2", 850, 900)])
-    assert page_marker_number(page) == 1  # first matching marker is the page marker
+    assert page_marker_number(page) == 1  # the bottom-right ROI uses the first page marker
 
 
 def test_x_in_ocr_text_does_not_exclude_row():

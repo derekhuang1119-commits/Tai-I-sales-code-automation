@@ -68,7 +68,7 @@ def run_review_gui(ocr_backend: OCRBackend | None = None) -> None:
     """Launch the review UI with an injected local OCR backend."""
 
     try:
-        from PySide6.QtWidgets import QApplication, QMessageBox
+        from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox, QStatusBar
     except ImportError as exc:
         raise RuntimeError("GUI 支援需要安裝 PySide6。") from exc
     app = QApplication.instance() or QApplication([])
@@ -81,8 +81,10 @@ def run_review_gui(ocr_backend: OCRBackend | None = None) -> None:
         except OCRModelUnavailable as exc:
             QMessageBox.critical(window, "OCR 模型錯誤", str(exc))
     if ocr_backend is not None:
-        window.setStatusBar(QLabel("已載入離線 OCR；低信心欄位需人工確認"))
-        window._batch_processor = BatchProcessor(ocr_backend)  # keep injected backend alive
+        window.setStatusBar(QStatusBar())
+        window.statusBar().showMessage("已載入離線 OCR；低信心欄位需人工確認")
+        window.ocr_backend = ocr_backend
+        window.batch_processor = BatchProcessor(ocr_backend)
     window.resize(900, 500)
     window.show()
     app.exec()
